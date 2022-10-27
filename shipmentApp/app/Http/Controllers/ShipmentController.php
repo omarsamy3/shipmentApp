@@ -25,7 +25,7 @@ class ShipmentController extends Controller
      */
     public function create()
     {
-        //
+        return view('shipments.create');
     }
 
     /**
@@ -36,7 +36,18 @@ class ShipmentController extends Controller
      */
     public function store(StoreShipmentRequest $request)
     {
-        //
+        // //Add some validation.
+        // $validated = $request->validated();
+
+        // //Create a new shipment
+        // $shipment = $request->shipments()->create($validated);
+
+        // //Redirect to the same page.
+        // return redirect()
+        // ->route('shipments.create', $shipment)
+        // ->with('success', 'Shipment created successfully ' .
+        // $shipment->shiper.
+        // $shipment->code);
     }
 
     /**

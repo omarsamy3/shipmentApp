@@ -14,8 +14,4 @@ class Shipment extends Model
         'shiper', 'weight', 'description', 'status', 'price', 'img_path', 'code'
     ];
 
-
-    protected $casts = [
-        'status' => ProductStatusEnum::class
-    ];
 }
