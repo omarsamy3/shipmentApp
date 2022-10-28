@@ -5,91 +5,101 @@ namespace App\Http\Controllers;
 use App\Models\Shipment;
 use App\Http\Requests\StoreShipmentRequest;
 use App\Http\Requests\UpdateShipmentRequest;
+use Nette\Utils\Image;
+use Illuminate\Http\Request;
+use Illuminate\Http\Response;
+
 
 class ShipmentController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
     public function index()
     {
         //
     }
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
     public function create()
     {
         return view('shipments.create');
     }
 
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \App\Http\Requests\StoreShipmentRequest  $request
-     * @return \Illuminate\Http\Response
-     */
+
     public function store(StoreShipmentRequest $request)
     {
-        // //Add some validation.
-        // $validated = $request->validated();
+        //The request is validated...
+        $validated = $request->validated();
 
-        // //Create a new shipment
-        // $shipment = $request->shipments()->create($validated);
+        //Create a new shipment.
+        $shipment = new Shipment();
 
-        // //Redirect to the same page.
-        // return redirect()
-        // ->route('shipments.create', $shipment)
-        // ->with('success', 'Shipment created successfully ' .
-        // $shipment->shiper.
-        // $shipment->code);
+        //Fill the shipment with the validated data.
+        $shipment-> code = $request->input('code');
+        $shipment->shiper = $request->input('shiper');
+        $shipment->description = $request->input('description');
+        $shipment->weight = $request->input('weight');
+        $shipment->status = $request->input('status');
+
+        //Save the image.
+        if($request->hasFile('img-path')){
+            $image = $request->file('img-path');
+            $filename = time() . '.' . $image->getClientOriginalExtension();
+            $location = public_path('images/' . $filename);
+            Image::make($image)->resize(800, 400)->save($location);
+            $shipment->img_path = $filename;
+        }else{
+            $shipment->img_path = 'noimage.jpg';
+        }
+        // $img = $request->file('img_path');
+        // $img_name = $img->getClientOriginalName();
+        // $img->move(public_path('images'), $img_name);
+        // $ourImgPath = 'images/' . $img_name;
+        // $shipment->img_path = $ourImgPath;
+
+        //Calculate the price.
+        $weightInput = $request->input('weight');
+        switch($weightInput){
+            //price is 10 if, 1 <= weight <= 10
+            case ($weightInput >= 1 && $weightInput < 10):
+                $shipment->price = 10;
+                break;
+
+            //price is 100 if, 11 <= weight <= 25
+            case ($weightInput >= 10 && $weightInput <= 25):
+                $shipment->price = 100;
+                break;
+
+            //price is 300 if, 25 < weight
+            case ($weightInput > 25):
+                $shipment->price = 300;
+                break;
+        }
+
+        //Save the shipment.
+        $shipment->save();
+
+        //Redirect to the home page.
+        return redirect()
+        ->route('shipments.create')
+        ->with('success', 'Shipment created successfully.');
     }
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  \App\Models\Shipment  $shipment
-     * @return \Illuminate\Http\Response
-     */
     public function show(Shipment $shipment)
     {
-        //
+        return view('shipments.show', ['shipment'=> $shipment]);
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  \App\Models\Shipment  $shipment
-     * @return \Illuminate\Http\Response
-     */
+
     public function edit(Shipment $shipment)
     {
         //
     }
 
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \App\Http\Requests\UpdateShipmentRequest  $request
-     * @param  \App\Models\Shipment  $shipment
-     * @return \Illuminate\Http\Response
-     */
+
     public function update(UpdateShipmentRequest $request, Shipment $shipment)
     {
         //
     }
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  \App\Models\Shipment  $shipment
-     * @return \Illuminate\Http\Response
-     */
+
     public function destroy(Shipment $shipment)
     {
         //

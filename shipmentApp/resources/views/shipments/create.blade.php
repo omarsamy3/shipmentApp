@@ -4,7 +4,7 @@
 
 
 @section('content')
-    <h1>Create a new Post</h1>
+    <h1>Create a new Shipment</h1>
 
     <form method="POST" action="{{route('shipments.store')}}">
         @csrf {{--To avoid the security errors.--}}

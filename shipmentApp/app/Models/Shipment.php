@@ -9,6 +9,7 @@ class Shipment extends Model
 {
     use HasFactory;
 
+
     //Allow mass assignment for these fields.
     protected $fillable = [
         'shiper', 'weight', 'description', 'status', 'price', 'img_path', 'code'

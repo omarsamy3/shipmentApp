@@ -13,7 +13,7 @@ class StoreShipmentRequest extends FormRequest
      */
     public function authorize()
     {
-        return false;
+        return true;
     }
 
     /**
@@ -24,7 +24,11 @@ class StoreShipmentRequest extends FormRequest
     public function rules()
     {
         return [
-            //
+            'code' => 'required|unique:shipments,code',
+            'shiper' => ['required', 'min:3'],
+            'description' => ['required', 'min:10'],
+            'weight' => ['required', 'numeric', 'min:0.1'],
+            'img_path' => ['max:10240'],
         ];
     }
 }
