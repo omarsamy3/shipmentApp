@@ -24,7 +24,7 @@
             <p><b> Price:</b>{{$shipment->price}} $</p>
             <p><b> Description</b>{{$shipment->description}}</p>
 
-            {{-- <a href="{{route('shipments.edit', [$shipment])}}">Edit Post</a> --}}
+            <a href="{{route('shipments.edit', [$shipment])}}">Edit Post</a>
 
             <form method="POST" action="{{route('shipments.destroy', [$shipment])}}">
                 @csrf
