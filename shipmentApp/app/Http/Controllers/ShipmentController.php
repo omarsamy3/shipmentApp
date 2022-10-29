@@ -90,18 +90,66 @@ class ShipmentController extends Controller
 
     public function edit(Shipment $shipment)
     {
-        //
+        return view('shipments.edit', ['shipment'=> $shipment]);
     }
 
 
     public function update(UpdateShipmentRequest $request, Shipment $shipment)
     {
-        //
+        $validated = $request->validated();
+
+        //Update the Post.
+        $shipment-> code = $request->input('code');
+        $shipment->shiper = $request->input('shiper');
+        $shipment->description = $request->input('description');
+        $shipment->weight = $request->input('weight');
+        $shipment->status = $request->input('status');
+
+        //Save the image.
+        if($request->hasFile('img-path')){
+            $image = $request->file('img-path');
+            $filename = time() . '.' . $image->getClientOriginalExtension();
+            $location = public_path('images/' . $filename);
+            Image::make($image)->resize(800, 400)->save($location);
+            $shipment->img_path = $filename;
+        }else{
+            $shipment->img_path = 'noimage.jpg';
+        }
+
+        //Calculate the price.
+        $weightInput = $request->input('weight');
+        switch($weightInput){
+            //price is 10 if, 1 <= weight <= 10
+            case ($weightInput >= 1 && $weightInput < 10):
+                $shipment->price = 10;
+                break;
+
+            //price is 100 if, 11 <= weight <= 25
+            case ($weightInput >= 10 && $weightInput <= 25):
+                $shipment->price = 100;
+                break;
+
+            //price is 300 if, 25 < weight
+            case ($weightInput > 25):
+                $shipment->price = 300;
+                break;
+        }
+
+        //Save the shipment.
+        $shipment->save();
+
+        return redirect()
+        ->route('shipments.show',[$shipment])
+        ->with('success', 'Shipment updated successfully');
     }
 
 
     public function destroy(Shipment $shipment)
     {
-        //
+        $shipment->delete();
+
+        return redirect()
+        ->route('home')
+        ->with('success', 'Post deleted successfully ');
     }
 }
