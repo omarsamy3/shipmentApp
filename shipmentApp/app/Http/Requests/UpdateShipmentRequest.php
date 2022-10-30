@@ -24,7 +24,7 @@ class UpdateShipmentRequest extends FormRequest
     public function rules()
     {
         return [
-            //
+
         ];
     }
 }

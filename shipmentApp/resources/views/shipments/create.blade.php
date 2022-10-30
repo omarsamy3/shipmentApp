@@ -6,7 +6,7 @@
 @section('content')
     <h1>Create a new Shipment</h1>
 
-    <form method="POST" action="{{route('shipments.store')}}">
+    <form method="POST" action="{{route('shipments.store')}}" enctype="multipart/form-data">
         @csrf {{--To avoid the security errors.--}}
 
          {{-- Shipper Name --}}
@@ -47,7 +47,7 @@
 
          {{-- Shipment Image --}}
     <label for="">Shipment Image</label>
-    <input type="file" id="myImg" name="img-path">
+    <input type="file" id="myImg" name="img-path" required value="{{old('img_path')}}">
     @error('img-path')
     <div class="error">
         {{$message}}

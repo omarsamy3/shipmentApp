@@ -15,4 +15,9 @@ class Shipment extends Model
         'shiper', 'weight', 'description', 'status', 'price', 'img_path', 'code'
     ];
 
+    //Link with the JournalEntity table
+   public function journal_entity(){
+    return $this->hasMany(JournalEntity::class);
+}
+
 }

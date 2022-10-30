@@ -4,7 +4,7 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class StoreShipmentRequest extends FormRequest
+class StoreJournalEntityRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -24,10 +24,7 @@ class StoreShipmentRequest extends FormRequest
     public function rules()
     {
         return [
-            'code' => 'required|unique:shipments,code',
-            'shiper' => ['required', 'min:3'],
-            'description' => ['required', 'min:10'],
-            'weight' => ['required', 'numeric', 'min:0.1'],
+
         ];
     }
 }

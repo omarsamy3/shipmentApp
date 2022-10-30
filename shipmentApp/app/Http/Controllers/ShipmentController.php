@@ -2,21 +2,18 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\JournalEntity;
 use App\Models\Shipment;
 use App\Http\Requests\StoreShipmentRequest;
 use App\Http\Requests\UpdateShipmentRequest;
 use Nette\Utils\Image;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use app\Http\Controllers\JournalEntityController;
 
 
 class ShipmentController extends Controller
 {
-    public function index()
-    {
-        //
-    }
-
     public function create()
     {
         return view('shipments.create');
@@ -25,9 +22,6 @@ class ShipmentController extends Controller
 
     public function store(StoreShipmentRequest $request)
     {
-        //The request is validated...
-        $validated = $request->validated();
-
         //Create a new shipment.
         $shipment = new Shipment();
 
@@ -40,19 +34,12 @@ class ShipmentController extends Controller
 
         //Save the image.
         if($request->hasFile('img-path')){
-            $image = $request->file('img-path');
-            $filename = time() . '.' . $image->getClientOriginalExtension();
-            $location = public_path('images/' . $filename);
-            Image::make($image)->resize(800, 400)->save($location);
-            $shipment->img_path = $filename;
-        }else{
-            $shipment->img_path = 'noimage.jpg';
+        $img = $request->file('img-path');
+        $img_name = $img->getClientOriginalName();
+        $img->move(public_path('images'), $img_name);
+        $ourImgPath = 'images/' . $img_name;
+        $shipment->img_path = $ourImgPath;
         }
-        // $img = $request->file('img_path');
-        // $img_name = $img->getClientOriginalName();
-        // $img->move(public_path('images'), $img_name);
-        // $ourImgPath = 'images/' . $img_name;
-        // $shipment->img_path = $ourImgPath;
 
         //Calculate the price.
         $weightInput = $request->input('weight');
@@ -76,9 +63,15 @@ class ShipmentController extends Controller
         //Save the shipment.
         $shipment->save();
 
+        //Check if the status is done, then set the journal entities.
+        if($shipment->status == 'done'){
+            //route to the JournalEntityController, to create the journal entities.
+            app('App\Http\Controllers\JournalEntityController')->create($shipment);
+        }
+
         //Redirect to the home page.
         return redirect()
-        ->route('shipments.create')
+        ->route('shipments.create', [$shipment])
         ->with('success', 'Shipment created successfully.');
     }
 
@@ -96,9 +89,7 @@ class ShipmentController extends Controller
 
     public function update(UpdateShipmentRequest $request, Shipment $shipment)
     {
-        $validated = $request->validated();
-
-        //Update the Post.
+        //Update the Shipment.
         $shipment-> code = $request->input('code');
         $shipment->shiper = $request->input('shiper');
         $shipment->description = $request->input('description');
@@ -107,14 +98,12 @@ class ShipmentController extends Controller
 
         //Save the image.
         if($request->hasFile('img-path')){
-            $image = $request->file('img-path');
-            $filename = time() . '.' . $image->getClientOriginalExtension();
-            $location = public_path('images/' . $filename);
-            Image::make($image)->resize(800, 400)->save($location);
-            $shipment->img_path = $filename;
-        }else{
-            $shipment->img_path = 'noimage.jpg';
-        }
+            $img = $request->file('img-path');
+            $img_name = $img->getClientOriginalName();
+            $img->move(public_path('images'), $img_name);
+            $ourImgPath = 'images/' . $img_name;
+            $shipment->img_path = $ourImgPath;
+            }
 
         //Calculate the price.
         $weightInput = $request->input('weight');
@@ -138,6 +127,11 @@ class ShipmentController extends Controller
         //Save the shipment.
         $shipment->save();
 
+        //Check if the status is done, then set the journal entities.
+        if($shipment->status == 'done'){
+            //route to the JournalEntityController, to create the journal entities.
+            app('App\Http\Controllers\JournalEntityController')->create($shipment);
+        }
         return redirect()
         ->route('shipments.show',[$shipment])
         ->with('success', 'Shipment updated successfully');

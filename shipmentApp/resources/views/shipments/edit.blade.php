@@ -48,7 +48,7 @@
 
          {{-- Shipment Image --}}
     <label for="">Shipment Image</label>
-    <input type="file" id="myImg" name="img-path" value="{{old('img-path', $shipment->img_path)}}">
+    <input type="file" id="myImg" name="img-path" value="{{old('img-path',$shipment->img_path)}}">
     @error('img-path')
     <div class="error">
         {{$message}}
